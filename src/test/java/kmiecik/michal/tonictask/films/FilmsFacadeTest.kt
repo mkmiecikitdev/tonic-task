@@ -1,9 +1,7 @@
 package kmiecik.michal.tonictask.films
 
-import io.vavr.collection.List
 import kmiecik.michal.tonictask.TestSamples.sampleFilms
 import kmiecik.michal.tonictask.TestUtils.valueOfMono
-import kmiecik.michal.tonictask.films.api.NewFilm
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -47,8 +45,5 @@ class FilmsFacadeTest {
         assertEquals(3, savedFilms.size())
         assertEquals(3, allFilms.size())
     }
-
-
-
 
 }

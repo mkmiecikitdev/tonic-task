@@ -24,11 +24,6 @@ class FilmsFacade(
                 .map { List.ofAll(it) }
     }
 
-    fun getFilm(id: String): Mono<FilmDto> {
-        return filmsRepository.findById(id)
-                .map { it.toDto() }
-    }
-
     private fun saveNewFilms(newFilms: List<NewFilm>): Mono<List<FilmDto>> {
         return newFilms.map { filmFactory.create(it) }
                 .let { filmsRepository.saveAll(it) }
@@ -37,6 +32,5 @@ class FilmsFacade(
                 .map { List.ofAll(it) }
 
     }
-
 
 }
