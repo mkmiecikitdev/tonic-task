@@ -7,7 +7,8 @@ enum class AppError {
 
     CANNOT_PARSE_DATE,
     CANNOT_PARSE_CURRENCY,
-    CANNOT_PARSE_PRICE;
+    CANNOT_PARSE_PRICE,
+    INVALID_RATING;
 
     fun <T> toEither() = Either.left<AppError, T>(this)
 
@@ -15,6 +16,9 @@ enum class AppError {
 
 }
 
-//fun <T> Either<AppError, T>.merge() = this.mapLeft { it.toMono<T>() }
-//        .getOrElseGet { it -> it }
-//
+fun <T> Either<T, T>.merge() = this.getOrElseGet { it }
+
+
+
+
+

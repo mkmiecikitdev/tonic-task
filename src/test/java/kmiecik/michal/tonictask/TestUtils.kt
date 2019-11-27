@@ -24,4 +24,10 @@ object TestUtils {
         asserts(either!!.left)
     }
 
+    fun <R> assertMono(mono: Mono<R>, asserts: (r: R) -> Unit) {
+        assertNotNull(mono)
+        val result = mono.block()
+        asserts(result)
+    }
+
 }

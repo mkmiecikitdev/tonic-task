@@ -2,6 +2,7 @@ package kmiecik.michal.tonictask.repertoire
 
 
 import kmiecik.michal.tonictask.TestSamples.sampleFilms
+import kmiecik.michal.tonictask.TestUtils.assertMono
 import kmiecik.michal.tonictask.TestUtils.assertMonoEitherLeft
 import kmiecik.michal.tonictask.TestUtils.assertMonoEitherRight
 import kmiecik.michal.tonictask.errors.AppError
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class RepertoireFacadeTest {
 
@@ -30,17 +32,20 @@ class RepertoireFacadeTest {
         filmsFacade.createFilmCatalog(sampleFilms()).block()
 
         // when
-        val result = facade.listExtendedDataRepertoires().block()
+        val result = facade.listExtendedRepertoiresData()
 
         // then
 
-        assertNotNull(result)
-        assertEquals(3, result.size())
+        assertMono(result) {
+            assertEquals(3, it.size())
 
-        result.map {
-            assertPriceIsDefault(it)
-            assertEquals(0, it.times.size())
+            it.map { item ->
+                assertPriceIsDefault(item)
+                assertEquals(0, item.times.size())
+                assertTrue { item.filmName.isNotBlank() }
+            }
         }
+
     }
 
     @Test
