@@ -5,10 +5,12 @@ import reactor.core.publisher.Mono
 
 enum class AppError {
 
+    UNAUTHORIZED,
     CANNOT_PARSE_DATE,
     CANNOT_PARSE_CURRENCY,
     CANNOT_PARSE_PRICE,
-    INVALID_RATING;
+    INVALID_RATING,
+    LOGIN_EXISTS;
 
     fun <T> toEither() = Either.left<AppError, T>(this)
 
