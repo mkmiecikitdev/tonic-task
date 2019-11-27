@@ -15,32 +15,18 @@ class RepertoireFacade(private val repertoireRepository: RepertoireRepository) {
         val repertoire: Mono<Repertoire> = repertoireRepository.findByFilmId(updateFilmPriceDto.filmId)
                 .defaultIfEmpty(newRepertoire(updateFilmPriceDto.filmId))
 
-        val v: Mono<Either<AppError, Repertoire>> = repertoire.map {
-            update(it, updateFilmPriceDto)
-        }
-
-        return v.map {
-            it.map {
-
+        return repertoire.flatMap { r ->
+            convertCurrency(updateFilmPriceDto.currency).flatMap { c ->
+                convertPrice(updateFilmPriceDto.price).map { p ->
+                    repertoireRepository.save(r)
+                            .map { saved ->
+                                Either.right<AppError, RepertoireDto>(saved.toDto())
+                            }
+                }
             }
+                    .mapLeft { Mono.just(Either.left<AppError, RepertoireDto>(it)) }
+                    .getOrElseGet { it }
         }
-    }
-
-    private fun update(repertoire: Repertoire, updateFilmPriceDto: UpdateFilmPriceDto): Either<AppError, Repertoire> {
-        val currency: Either<AppError, Currency> = convertCurrency(updateFilmPriceDto.currency)
-        val price: Either<AppError, BigDecimal> = convertPrice(updateFilmPriceDto.price)
-
-        return currency.flatMap { c ->
-            price.map { p ->
-                repertoire.updatePrice(p, c)
-            }
-        }
-    }
-
-    private fun save(repertoire: Repertoire): Either<AppError, Mono<RepertoireDto>> {
-        return repertoireRepository.save(repertoire)
-                .map { it.toDto() }
-                .map { Either.right(it) }
     }
 
     private fun newRepertoire(filmId: String): Repertoire {
