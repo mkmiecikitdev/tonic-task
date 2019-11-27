@@ -1,6 +1,7 @@
 package kmiecik.michal.tonictask.films
 
 import io.vavr.collection.List
+import kmiecik.michal.tonictask.TestSamples.sampleFilms
 import kmiecik.michal.tonictask.TestUtils.valueOfMono
 import kmiecik.michal.tonictask.films.api.NewFilm
 import org.junit.jupiter.api.BeforeEach
@@ -25,7 +26,7 @@ class FilmsFacadeTest {
 
         // then catalog is created
         val valueOfMono = valueOfMono(result)
-        val savedFilms = valueOfMono(facade.getFilmsData())
+        val savedFilms = valueOfMono(facade.listFilms())
 
         assertEquals(3, valueOfMono.size())
         assertEquals(3, savedFilms.size())
@@ -41,19 +42,13 @@ class FilmsFacadeTest {
 
         // then catalog is created
         val savedFilms = valueOfMono(result)
-        val allFilms = valueOfMono(facade.getFilmsData())
+        val allFilms = valueOfMono(facade.listFilms())
 
         assertEquals(3, savedFilms.size())
         assertEquals(3, allFilms.size())
     }
 
-    private fun sampleFilms(): List<NewFilm> {
-        return List.of(
-                NewFilm(name = "Film 1", externalIds = List.of(FilmExternalId(id = "external1", type = FilmExternalIdType.OMDb))),
-                NewFilm(name = "Film 2", externalIds = List.of(FilmExternalId(id = "external1", type = FilmExternalIdType.OMDb))),
-                NewFilm(name = "Film 3", externalIds = List.of(FilmExternalId(id = "external1", type = FilmExternalIdType.OMDb)))
-        )
-    }
+
 
 
 }

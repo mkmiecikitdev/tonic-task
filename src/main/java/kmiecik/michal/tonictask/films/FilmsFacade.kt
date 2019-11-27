@@ -12,12 +12,12 @@ class FilmsFacade(
     fun createFilmCatalog(newFilms: List<NewFilm>): Mono<List<FilmDto>> {
         return filmsRepository.countAll()
                 .flatMap { count ->
-                    if (count > 0) getFilmsData()
+                    if (count > 0) listFilms()
                     else saveNewFilms(newFilms)
                 }
     }
 
-    fun getFilmsData(): Mono<List<FilmDto>> {
+    fun listFilms(): Mono<List<FilmDto>> {
         return filmsRepository.findAll()
                 .map { it.toDto() }
                 .collectList()

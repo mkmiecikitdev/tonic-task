@@ -6,7 +6,7 @@ import java.time.LocalTime
 data class DisplayHours(val times: List<LocalTime> = List.empty()) {
 
     fun addTime(time: LocalTime): DisplayHours {
-        if(!times.exists{ it.compareTo(time) == 0 }) {
+        if (!times.exists { it.compareTo(time) == 0 }) {
             return DisplayHours(times.append(time))
         }
 

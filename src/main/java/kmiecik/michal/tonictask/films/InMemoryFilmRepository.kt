@@ -11,9 +11,9 @@ import java.util.concurrent.atomic.AtomicReference
 class InMemoryFilmRepository(private var films: AtomicReference<Map<String, FilmData>> = AtomicReference(HashMap.empty())) : FilmsRepository {
 
     override fun findById(id: String): Mono<FilmData> {
-        return Mono.just(
-                films.get()[id].orNull
-        )
+        return films.get()[id]
+                .map { Mono.just(it) }
+                .getOrElse { Mono.empty() }
     }
 
     override fun countAll(): Mono<Int> {

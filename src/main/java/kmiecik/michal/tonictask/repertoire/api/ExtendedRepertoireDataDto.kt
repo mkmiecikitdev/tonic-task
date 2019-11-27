@@ -2,9 +2,10 @@ package kmiecik.michal.tonictask.repertoire.api
 
 import io.vavr.collection.List
 
-data class RepertoireDto(
+data class ExtendedRepertoireDataDto (
         val filmId: String,
-        val priceValue: Float,
+        val filmName: String,
+        val priceValue: String,
         val priceCurrency: String,
         val times: List<String>
 )

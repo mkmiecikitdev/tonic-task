@@ -1,7 +1,7 @@
 package kmiecik.michal.tonictask.repertoire
 
 import kmiecik.michal.tonictask.kernel.parse
-import kmiecik.michal.tonictask.repertoire.api.RepertoireDto
+import kmiecik.michal.tonictask.repertoire.api.RepertoireDataDto
 import java.math.BigDecimal
 import java.time.LocalTime
 
@@ -31,10 +31,10 @@ data class Repertoire(
         return this
     }
 
-    fun toDto(): RepertoireDto {
-        return RepertoireDto(
+    fun toDto(): RepertoireDataDto {
+        return RepertoireDataDto(
                 filmId = filmId,
-                priceValue = price.value.toFloat(),
+                priceValue = price.value.toString(),
                 priceCurrency = price.currency.name,
                 times = displayHours.times.map { it.parse() }
         )
