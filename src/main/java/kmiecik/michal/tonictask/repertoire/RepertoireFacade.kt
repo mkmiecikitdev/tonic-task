@@ -3,25 +3,22 @@ package kmiecik.michal.tonictask.repertoire
 import io.vavr.Tuple
 import io.vavr.collection.List
 import io.vavr.control.Either
-import io.vavr.control.Try
 import kmiecik.michal.tonictask.errors.AppError
 import kmiecik.michal.tonictask.films.FilmsFacade
 import kmiecik.michal.tonictask.films.api.FilmDto
-import kmiecik.michal.tonictask.kernel.TimeUtils
 import kmiecik.michal.tonictask.repertoire.api.*
 import reactor.core.publisher.Mono
-import java.math.BigDecimal
 
-class RepertoireFacade(private val repertoireRepository: RepertoireRepository, private val filmsFacade: FilmsFacade) {
+class RepertoireFacade(private val repertoireRepository: RepertoireRepository,
+                       private val filmsFacade: FilmsFacade,
+                       private val timeUpdater: TimeUpdater,
+                       private val priceUpdater: PriceUpdater) {
 
     fun updateFilmPrice(updateFilmPriceDto: UpdateFilmPriceDto): Mono<Either<AppError, RepertoireDataDto>> {
         return getRepertoireOrEmpty(updateFilmPriceDto.filmId).flatMap { repertoire ->
-            parseCurrency(updateFilmPriceDto.currency).flatMap { currency ->
-                parsePrice(updateFilmPriceDto.price).map { price ->
-                    repertoire.updatePrice(price, currency)
-                    save(repertoire)
-                }
-            }.mapLeft { it.toMono<RepertoireDataDto>() }
+            priceUpdater.updatePrice(repertoire, updateFilmPriceDto.price, updateFilmPriceDto.currency)
+                    .map { save(it) }
+                    .mapLeft { it.toMono<RepertoireDataDto>() }
                     .getOrElseGet { it }
         }
     }
@@ -29,11 +26,9 @@ class RepertoireFacade(private val repertoireRepository: RepertoireRepository, p
     fun addFilmTime(addRepertoireTimeDto: AddRepertoireTimeDto): Mono<Either<AppError, RepertoireDataDto>> {
         return getRepertoireOrEmpty(addRepertoireTimeDto.filmId)
                 .flatMap { repertoire ->
-                    TimeUtils.toLocalTime(addRepertoireTimeDto.time)
-                            .map { time ->
-                                repertoire.addTime(time)
-                                save(repertoire)
-                            }.mapLeft { it.toMono<RepertoireDataDto>() }
+                    timeUpdater.addTime(repertoire, addRepertoireTimeDto.time)
+                            .map { save(it) }
+                            .mapLeft { it.toMono<RepertoireDataDto>() }
                             .getOrElseGet { it }
                 }
     }
@@ -41,11 +36,9 @@ class RepertoireFacade(private val repertoireRepository: RepertoireRepository, p
     fun removeFilmTime(removeRepertoireTimeDto: RemoveRepertoireTimeDto): Mono<Either<AppError, RepertoireDataDto>> {
         return getRepertoireOrEmpty(removeRepertoireTimeDto.filmId)
                 .flatMap { repertoire ->
-                    TimeUtils.toLocalTime(removeRepertoireTimeDto.time)
-                            .map { time ->
-                                repertoire.removeTime(time)
-                                save(repertoire)
-                            }.mapLeft { it.toMono<RepertoireDataDto>() }
+                    timeUpdater.removeTime(repertoire, removeRepertoireTimeDto.time)
+                            .map { save(it) }
+                            .mapLeft { it.toMono<RepertoireDataDto>() }
                             .getOrElseGet { it }
                 }
     }
@@ -53,14 +46,10 @@ class RepertoireFacade(private val repertoireRepository: RepertoireRepository, p
     fun updateFilmTime(updateRepertoireTimeDto: UpdateRepertoireTimeDto): Mono<Either<AppError, RepertoireDataDto>> {
         return getRepertoireOrEmpty(updateRepertoireTimeDto.filmId)
                 .flatMap { repertoire ->
-                    TimeUtils.toLocalTime(updateRepertoireTimeDto.timeFrom).flatMap { timeFrom ->
-                        TimeUtils.toLocalTime(updateRepertoireTimeDto.timeTo)
-                                .map { timeTo ->
-                                    repertoire.updateTime(timeFrom, timeTo)
-                                    save(repertoire)
-                                }
-                    }.mapLeft { it.toMono<RepertoireDataDto>() }
-                            .getOrElseGet { it } // TODO W RAZIE JAK MERGE NIE DZIALA
+                    timeUpdater.updateTime(repertoire, updateRepertoireTimeDto.timeFrom, updateRepertoireTimeDto.timeTo)
+                            .map { save(it) }
+                            .mapLeft { it.toMono<RepertoireDataDto>() }
+                            .getOrElseGet { it }
                 }
     }
 
@@ -103,17 +92,6 @@ class RepertoireFacade(private val repertoireRepository: RepertoireRepository, p
                 .map { saved ->
                     Either.right<AppError, RepertoireDataDto>(saved.toDto())
                 }
-    }
-
-
-    private fun parseCurrency(currency: String): Either<AppError, Currency> {
-        return Try.of { Currency.valueOf(currency) }
-                .toEither(AppError.CANNOT_PARSE_CURRENCY)
-    }
-
-    private fun parsePrice(price: String): Either<AppError, BigDecimal> {
-        return Try.of { BigDecimal(price) }
-                .toEither(AppError.CANNOT_PARSE_PRICE)
     }
 
     private fun getRepertoireOrEmpty(filmId: String): Mono<Repertoire> {

@@ -203,5 +203,4 @@ class RepertoireFacadeTest {
         assertEquals("10", repertorie.priceValue)
     }
 
-
 }
