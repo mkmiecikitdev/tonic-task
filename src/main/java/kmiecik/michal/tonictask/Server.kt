@@ -1,11 +1,8 @@
 package kmiecik.michal.tonictask
 
-import kmiecik.michal.tonictask.films.FilmsModule
 import kmiecik.michal.tonictask.infrastructure.rest.RepertoireHandler
 import kmiecik.michal.tonictask.infrastructure.rest.UsersHandler
-import kmiecik.michal.tonictask.ratings.RatingsModule
-import kmiecik.michal.tonictask.repertoire.RepertoireModule
-import kmiecik.michal.tonictask.users.UsersModule
+import kmiecik.michal.tonictask.infrastructure.security.JwtService
 import org.reactivestreams.Publisher
 import org.springframework.http.server.reactive.ReactorHttpHandlerAdapter
 import org.springframework.web.reactive.function.server.RouterFunctions
@@ -18,10 +15,12 @@ class Server {
 
     fun start(app: App) {
 
+        val jwtService = JwtService()
+
         val httpHandler = RouterFunctions
                 .toHttpHandler(
-                        UsersHandler(app.usersFacade).routes()
-                                .and(RepertoireHandler(app.repertoireFacade).routes())
+                        UsersHandler(app.usersFacade, jwtService).routes()
+                                .and(RepertoireHandler(app.repertoireFacade, jwtService).routes())
 
                 )
 

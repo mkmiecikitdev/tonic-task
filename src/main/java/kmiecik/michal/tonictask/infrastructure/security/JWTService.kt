@@ -1,0 +1,37 @@
+package kmiecik.michal.tonictask.infrastructure.security
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.security.Keys
+import io.vavr.jackson.datatype.VavrModule
+import kmiecik.michal.tonictask.infrastructure.rest.BEARER
+import kmiecik.michal.tonictask.users.api.UserDataDto
+import java.util.*
+
+
+class JwtService(private val objectMapper: ObjectMapper = ObjectMapper().registerModule(KotlinModule()).registerModule(VavrModule())) {
+
+    fun generateJwt(userData: UserDataDto): String =
+            Jwts.builder()
+                    .signWith(Keys.hmacShaKeyFor(JWT_SECRET.toByteArray()), SignatureAlgorithm.HS512)
+                    .setExpiration(Date(System.currentTimeMillis() + EXPIRATION))
+                    .setSubject(objectMapper.writeValueAsString(userData))
+                    .compact()
+
+    fun getUserData(token: String): UserDataDto =
+            Jwts.parser()
+                    .setSigningKey(JWT_SECRET.toByteArray())
+                    .parseClaimsJws(token.replace(BEARER, ""))
+                    .body
+                    .subject.let {
+                objectMapper.readValue(it, UserDataDto::class.java)
+            }
+
+    companion object {
+        const val JWT_SECRET: String = "SgVkYp2s5v8y/B?E(H+MbQeThWmZq4t6w9z\$C&F)J@NcRfUjXn2r5u8x!A%D*G-KaPdSgVkYp3s6v9y\$B?E(H+MbQeThWmZq4t7w!z%C*F)J@NcRfUjXn2r5u8x/A?D(" // TODO FROM SAFE FILE
+        const val EXPIRATION = 864000000
+    }
+
+}
