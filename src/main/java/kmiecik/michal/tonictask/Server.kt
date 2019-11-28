@@ -1,5 +1,8 @@
 package kmiecik.michal.tonictask
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+import io.vavr.jackson.datatype.VavrModule
 import kmiecik.michal.tonictask.infrastructure.rest.RepertoireHandler
 import kmiecik.michal.tonictask.infrastructure.rest.UsersHandler
 import kmiecik.michal.tonictask.infrastructure.security.JwtService
@@ -14,13 +17,13 @@ import java.util.function.BiFunction
 class Server {
 
     fun start(app: App) {
-
-        val jwtService = JwtService()
+        val objectMapper: ObjectMapper = ObjectMapper().registerModule(KotlinModule()).registerModule(VavrModule())
+        val jwtService = JwtService(objectMapper)
 
         val httpHandler = RouterFunctions
                 .toHttpHandler(
-                        UsersHandler(app.usersFacade, jwtService).routes()
-                                .and(RepertoireHandler(app.repertoireFacade, jwtService).routes())
+                        UsersHandler(app.usersFacade, jwtService, objectMapper).routes()
+                                .and(RepertoireHandler(app.repertoireFacade, jwtService, objectMapper).routes())
 
                 )
 

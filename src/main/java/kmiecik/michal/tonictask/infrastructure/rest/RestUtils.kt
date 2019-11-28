@@ -1,5 +1,7 @@
 package kmiecik.michal.tonictask.infrastructure.rest
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.convertValue
 import io.vavr.control.Try
 import kmiecik.michal.tonictask.errors.AppError
 import kmiecik.michal.tonictask.kernel.MonoEither
@@ -15,10 +17,10 @@ import reactor.core.publisher.Mono
 const val AUTH_HEADER_KEY = "Authorization"
 const val BEARER = "Bearer"
 
-fun <T> MonoEither<T>.resolveEither(): Mono<ServerResponse> {
+fun <T> MonoEither<T>.resolveEither(objectMapper: ObjectMapper): Mono<ServerResponse> {
     return this.flatMap {
         it.map { result ->
-            ok().bodyValue(result)
+            ok().bodyValue(objectMapper.convertValue(result as Any))
         }.getOrElseGet { error ->
             status(resolveStatus(error))
                     .bodyValue(error)
@@ -26,10 +28,10 @@ fun <T> MonoEither<T>.resolveEither(): Mono<ServerResponse> {
     }
 }
 
-fun MonoEither<UserDataDto>.resolveEitherWithAuth(jwtMapper: (UserDataDto) -> String): Mono<ServerResponse> {
+fun MonoEither<UserDataDto>.resolveEitherWithAuth(objectMapper: ObjectMapper, jwtMapper: (UserDataDto) -> String): Mono<ServerResponse> {
     return this.flatMap {
         it.map { result ->
-            ok().header(AUTH_HEADER_KEY, "$BEARER ${jwtMapper(result)}").bodyValue(result)
+            ok().header(AUTH_HEADER_KEY, "$BEARER ${jwtMapper(result)}").bodyValue(objectMapper.convertValue(result as Any))
         }.getOrElseGet { error ->
             status(resolveStatus(error))
                     .bodyValue(error)

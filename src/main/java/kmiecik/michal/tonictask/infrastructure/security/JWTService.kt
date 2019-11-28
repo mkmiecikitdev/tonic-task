@@ -11,7 +11,7 @@ import kmiecik.michal.tonictask.users.api.UserDataDto
 import java.util.*
 
 
-class JwtService(private val objectMapper: ObjectMapper = ObjectMapper().registerModule(KotlinModule()).registerModule(VavrModule())) {
+class JwtService(private val objectMapper: ObjectMapper) {
 
     fun generateJwt(userData: UserDataDto): String =
             Jwts.builder()
