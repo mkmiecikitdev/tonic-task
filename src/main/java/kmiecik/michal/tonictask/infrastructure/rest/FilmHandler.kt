@@ -22,6 +22,7 @@ class FilmHandler(
             POST("/catalog", this@FilmHandler::createFilmCatalog)
             POST("/catalog-default", this@FilmHandler::createDefaultFilmCatalog)
             GET("/list", this@FilmHandler::listFilm)
+            GET("/details/{id}", this@FilmHandler::details)
         }
     }
 
@@ -43,6 +44,11 @@ class FilmHandler(
 
     private fun listFilm(req: ServerRequest): Mono<ServerResponse> {
         return filmsFacade.listFilms()
+                .let { serverResponseCreator.okFromMono { it } }
+    }
+
+    private fun details(req: ServerRequest): Mono<ServerResponse> {
+        return filmsFacade.loadFilmDetails(req.pathVariable("id"))
                 .let { serverResponseCreator.okFromMono { it } }
     }
 }

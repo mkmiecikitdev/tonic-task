@@ -10,8 +10,7 @@ import kmiecik.michal.tonictask.kernel.MonoEither
 import kmiecik.michal.tonictask.users.api.UserDataDto
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.ServerResponse.ok
-import org.springframework.web.reactive.function.server.ServerResponse.status
+import org.springframework.web.reactive.function.server.ServerResponse.*
 import reactor.core.publisher.Mono
 
 class ServerResponseCreator(private val objectMapper: ObjectMapper, private val jwtService: JwtService) {
@@ -19,6 +18,7 @@ class ServerResponseCreator(private val objectMapper: ObjectMapper, private val 
     fun <T : Any> okFromMono(mono: () -> Mono<T>): Mono<ServerResponse> {
         return mono().flatMap { result ->
             ok().bodyValue(objectMapper.convertValue(result))
+                    .switchIfEmpty(notFound().build())
         }
     }
 
@@ -30,7 +30,8 @@ class ServerResponseCreator(private val objectMapper: ObjectMapper, private val 
                 status(resolveStatus(error))
                         .bodyValue(error)
             }
-        }
+        }.switchIfEmpty(notFound().build())
+
     }
 
     fun fromUserData(monoEither: () -> MonoEither<UserDataDto>): Mono<ServerResponse> {

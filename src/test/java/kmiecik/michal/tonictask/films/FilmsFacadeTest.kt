@@ -2,6 +2,7 @@ package kmiecik.michal.tonictask.films
 
 import kmiecik.michal.tonictask.TestSamples.sampleCatalog
 import kmiecik.michal.tonictask.TestUtils.valueOfMono
+import kmiecik.michal.tonictask.infrastructure.omdb.OmdbService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

@@ -2,6 +2,7 @@ package kmiecik.michal.tonictask
 
 import kmiecik.michal.tonictask.films.FilmsFacade
 import kmiecik.michal.tonictask.films.FilmsModule
+import kmiecik.michal.tonictask.infrastructure.omdb.OmdbService
 import kmiecik.michal.tonictask.ratings.RatingsFacade
 import kmiecik.michal.tonictask.ratings.RatingsModule
 import kmiecik.michal.tonictask.repertoire.RepertoireFacade
@@ -26,7 +27,7 @@ interface App {
 class InMemoryApp(
         private val modules: Modules = Modules(),
         override val usersFacade: UsersFacade = modules.usersModule.createInMemoryFacade(),
-        override val filmsFacade: FilmsFacade = modules.filmsModule.createInMemoryFacade(),
+        override val filmsFacade: FilmsFacade = modules.filmsModule.createInMemoryFacade(OmdbService()),
         override val repertoireFacade: RepertoireFacade = modules.repertoireModule.createInMemoryFacade(filmsFacade),
         override val ratingsFacade: RatingsFacade = modules.ratingsModule.createInMemoryFacade(filmsFacade)
 ) : App

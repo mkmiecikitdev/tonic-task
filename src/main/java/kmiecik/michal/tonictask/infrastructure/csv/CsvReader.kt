@@ -25,6 +25,7 @@ class CsvReader {
                         films = films.append(NewFilmDto(name = words[0], externalIds = List.of(FilmExternalId(words[1], FilmExternalIdType.OMDb))))
                         line = it.readLine()
                     }
+                    it.close()
                     return@of NewCatalogDto(films)
                 }
             }.getOrElseGet { emptyCatalog() }

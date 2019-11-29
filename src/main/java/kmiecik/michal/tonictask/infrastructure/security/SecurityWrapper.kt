@@ -1,6 +1,5 @@
 package kmiecik.michal.tonictask.infrastructure.security
 
-import io.vavr.control.Try
 import kmiecik.michal.tonictask.errors.AppError
 import kmiecik.michal.tonictask.infrastructure.rest.helpers.Constants.AUTH_HEADER_KEY
 import kmiecik.michal.tonictask.users.Role
@@ -13,16 +12,13 @@ import reactor.core.publisher.Mono
 class SecurityWrapper(private val jwtService: JwtService) {
 
     fun onlyOwners(req: ServerRequest, action: (ServerRequest, UserDataDto) -> Mono<ServerResponse>): Mono<ServerResponse> {
-        return Try.of {
-            jwtService.getUserData(req.headers().header(AUTH_HEADER_KEY)[0])
-                    .let {
-                        return@let if (it.roles.contains(Role.OWNER))
-                            action(req, it)
-                        else
-                            unauthorized()
-                    }
-
-        }.getOrElseGet { unauthorized() }
+        return jwtService.getUserData(req.headers().header(AUTH_HEADER_KEY)[0])
+                .map {
+                    if (it.roles.contains(Role.OWNER))
+                        action(req, it)
+                    else
+                        unauthorized()
+                }.getOrElse { unauthorized() }
     }
 
     private fun unauthorized(): Mono<ServerResponse> {
