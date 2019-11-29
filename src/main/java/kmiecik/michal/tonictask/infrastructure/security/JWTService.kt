@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
+import io.vavr.control.Try
 import kmiecik.michal.tonictask.infrastructure.rest.helpers.Constants.BEARER
 import kmiecik.michal.tonictask.users.api.UserDataDto
 import java.util.*
@@ -11,24 +12,39 @@ import java.util.*
 
 class JwtService(private val objectMapper: ObjectMapper) {
 
-    fun generateJwt(userData: UserDataDto): String =
-            Jwts.builder()
-                    .signWith(Keys.hmacShaKeyFor(JWT_SECRET.toByteArray()), SignatureAlgorithm.HS512)
-                    .setExpiration(Date(System.currentTimeMillis() + EXPIRATION))
-                    .setSubject(objectMapper.writeValueAsString(userData))
-                    .compact()
+    fun generateJwt(userData: UserDataDto): String {
+        println(getSecret())
+        return Jwts.builder()
+                .signWith(Keys.hmacShaKeyFor(getSecret().toByteArray()), SignatureAlgorithm.HS512)
+                .setExpiration(Date(System.currentTimeMillis() + EXPIRATION))
+                .setSubject(objectMapper.writeValueAsString(userData))
+                .compact()
+    }
 
-    fun getUserData(token: String): UserDataDto =
-            Jwts.parser()
-                    .setSigningKey(JWT_SECRET.toByteArray())
-                    .parseClaimsJws(token.replace(BEARER, ""))
-                    .body
-                    .subject.let {
-                objectMapper.readValue(it, UserDataDto::class.java)
+
+    fun getUserData(token: String): UserDataDto {
+        println(getSecret())
+        return Jwts.parser()
+                .setSigningKey(getSecret().toByteArray())
+                .parseClaimsJws(token.replace(BEARER, ""))
+                .body
+                .subject.let {
+            objectMapper.readValue(it, UserDataDto::class.java)
+        }
+    }
+
+
+    private fun getSecret(): String {
+        return Try.of {
+            javaClass.classLoader.getResourceAsStream("sensitive.properties").let {
+                val prop = Properties()
+                prop.load(it)
+                prop.getProperty("jwt.secret")
             }
+        }.getOrElseGet { "" }
+    }
 
     companion object {
-        private const val JWT_SECRET: String = "SgVkYp2s5v8y/B?E(H+MbQeThWmZq4t6w9z\$C&F)J@NcRfUjXn2r5u8x!A%D*G-KaPdSgVkYp3s6v9y\$B?E(H+MbQeThWmZq4t7w!z%C*F)J@NcRfUjXn2r5u8x/A?D(" // TODO FROM SAFE FILE
         private const val EXPIRATION = 864000000
     }
 }
