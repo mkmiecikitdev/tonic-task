@@ -49,6 +49,7 @@ class ServerResponseCreator(private val objectMapper: ObjectMapper, private val 
     private fun resolveStatus(appError: AppError): HttpStatus {
         return when (appError) {
             AppError.UNAUTHORIZED -> HttpStatus.UNAUTHORIZED
+            AppError.BAD_CREDENTIALS -> HttpStatus.NOT_ACCEPTABLE
             else -> HttpStatus.BAD_REQUEST
         }
     }
