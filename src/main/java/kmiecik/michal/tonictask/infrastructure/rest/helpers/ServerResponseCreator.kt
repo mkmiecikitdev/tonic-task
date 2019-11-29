@@ -18,8 +18,7 @@ class ServerResponseCreator(private val objectMapper: ObjectMapper, private val 
     fun <T : Any> okFromMono(mono: () -> Mono<T>): Mono<ServerResponse> {
         return mono().flatMap { result ->
             ok().bodyValue(objectMapper.convertValue(result))
-                    .switchIfEmpty(notFound().build())
-        }
+        }.switchIfEmpty(notFound().build())
     }
 
     fun <T : Any> fromMonoEither(monoEither: () -> MonoEither<T>): Mono<ServerResponse> {
@@ -31,7 +30,6 @@ class ServerResponseCreator(private val objectMapper: ObjectMapper, private val 
                         .bodyValue(error)
             }
         }.switchIfEmpty(notFound().build())
-
     }
 
     fun fromUserData(monoEither: () -> MonoEither<UserDataDto>): Mono<ServerResponse> {
