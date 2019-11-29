@@ -20,7 +20,7 @@ class FilmHandler(private val filmsFacade: FilmsFacade, private val securityWrap
     }
 
     private fun createFilmCatalog(req: ServerRequest): Mono<ServerResponse> {
-        return securityWrapper.onlyOwners(req) { request, userData ->
+        return securityWrapper.onlyOwners(req) { request, _ ->
             request.bodyToMono<NewCatalogDto>().flatMap {
                 filmsFacade.createFilmCatalog(it)
                         .let { mono -> serverResponseCreator.okFromMono { mono } }
