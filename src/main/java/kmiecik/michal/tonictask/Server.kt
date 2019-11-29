@@ -3,9 +3,7 @@ package kmiecik.michal.tonictask
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.vavr.jackson.datatype.VavrModule
-import kmiecik.michal.tonictask.infrastructure.rest.FilmHandler
-import kmiecik.michal.tonictask.infrastructure.rest.RepertoireHandler
-import kmiecik.michal.tonictask.infrastructure.rest.UsersHandler
+import kmiecik.michal.tonictask.infrastructure.rest.*
 import kmiecik.michal.tonictask.infrastructure.security.JwtService
 import org.reactivestreams.Publisher
 import org.springframework.http.server.reactive.ReactorHttpHandlerAdapter
@@ -20,12 +18,15 @@ class Server {
     fun start(app: App) {
         val objectMapper: ObjectMapper = ObjectMapper().registerModule(KotlinModule()).registerModule(VavrModule())
         val jwtService = JwtService(objectMapper)
+        val securityWrapper = SecurityWrapper(jwtService)
+        val serverResponseCreator = ServerResponseCreator(objectMapper, jwtService)
+
 
         val httpHandler = RouterFunctions
                 .toHttpHandler(
-                        UsersHandler(app.usersFacade, jwtService, objectMapper).routes()
-                                .and(RepertoireHandler(app.repertoireFacade, jwtService, objectMapper).routes())
-                                .and(FilmHandler(app.filmsFacade, jwtService, objectMapper).routes())
+                        UsersHandler(app.usersFacade, serverResponseCreator).routes()
+                                .and(RepertoireHandler(app.repertoireFacade, securityWrapper, serverResponseCreator).routes())
+                                .and(FilmHandler(app.filmsFacade, securityWrapper, serverResponseCreator).routes())
 
                 )
 

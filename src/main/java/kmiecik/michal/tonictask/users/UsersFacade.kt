@@ -8,9 +8,8 @@ import kmiecik.michal.tonictask.kernel.MonoEither
 import kmiecik.michal.tonictask.users.api.UserDataDto
 import kmiecik.michal.tonictask.users.api.UserFormDto
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import reactor.core.publisher.Mono
 
-class UsersFacade (private val userRepository: UserRepository) {
+class UsersFacade(private val userRepository: UserRepository) {
 
     fun addOwner(userFormDto: UserFormDto): MonoEither<UserDataDto> {
         return addUser(userFormDto, HashSet.of(Role.CUSTOMER, Role.OWNER))
@@ -21,31 +20,42 @@ class UsersFacade (private val userRepository: UserRepository) {
     }
 
     fun login(userFormDto: UserFormDto): MonoEither<UserDataDto> {
-        return userRepository.findByLogin(userFormDto.login)
-                .map {
-                    return@map if(it.equalsHashedPass(userFormDto.password)) Either.right<AppError, UserDataDto>(it.toDto())
-                    else AppError.UNAUTHORIZED.toEither<UserDataDto>()
-                }
-                .switchIfEmpty(AppError.UNAUTHORIZED.toMono<UserDataDto>())
+        return wrapUserCredentials(userFormDto) { login, pass ->
+            userRepository.findByLogin(login)
+                    .map {
+                        return@map if (it.equalsHashedPass(pass)) Either.right<AppError, UserDataDto>(it.toDto())
+                        else AppError.UNAUTHORIZED.toEither<UserDataDto>()
+                    }
+                    .switchIfEmpty(AppError.UNAUTHORIZED.toMono<UserDataDto>())
+        }
     }
 
     private fun addUser(userFormDto: UserFormDto, roles: Set<Role>): MonoEither<UserDataDto> {
-        return userRepository.findByLogin(userFormDto.login).map { user ->
-            AppError.LOGIN_EXISTS.toEither<UserDataDto>()
-        }.switchIfEmpty(
-                createUser(userFormDto, roles)
-                        .let { userRepository.save(it) }
-                        .map { it.toDto() }
-                        .map { Either.right<AppError, UserDataDto>(it) }
-        )
+        return wrapUserCredentials(userFormDto) { login, pass ->
+            userRepository.findByLogin(login).map { user ->
+                AppError.LOGIN_EXISTS.toEither<UserDataDto>()
+            }.switchIfEmpty(
+                    createUser(login, pass, roles)
+                            .let { userRepository.save(it) }
+                            .map { it.toDto() }
+                            .map { Either.right<AppError, UserDataDto>(it) }
+            )
+        }
     }
 
-    private fun createUser(userFormDto: UserFormDto, roles: Set<Role>): User {
+    private fun createUser(login: String, pass: String, roles: Set<Role>): User {
         return User(
-                login = userFormDto.login,
-                hashedPassword = BCryptPasswordEncoder().encode(userFormDto.password),
+                login = login,
+                hashedPassword = BCryptPasswordEncoder().encode(pass),
                 roles = roles
         )
     }
 
+    private fun wrapUserCredentials(userFormDto: UserFormDto, action: (String, String) -> MonoEither<UserDataDto>): MonoEither<UserDataDto> {
+        return userFormDto.login?.let { login ->
+            userFormDto.password?.let { pass ->
+                action(login, pass)
+            }
+        } ?: AppError.BAD_CREDENTIALS.toMono()
+    }
 }
