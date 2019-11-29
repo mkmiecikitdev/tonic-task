@@ -1,9 +1,8 @@
-package kmiecik.michal.tonictask.infrastructure.rest
+package kmiecik.michal.tonictask.infrastructure.security
 
 import io.vavr.control.Try
 import kmiecik.michal.tonictask.errors.AppError
-import kmiecik.michal.tonictask.infrastructure.rest.Constants.AUTH_HEADER_KEY
-import kmiecik.michal.tonictask.infrastructure.security.JwtService
+import kmiecik.michal.tonictask.infrastructure.rest.helpers.Constants.AUTH_HEADER_KEY
 import kmiecik.michal.tonictask.users.Role
 import kmiecik.michal.tonictask.users.api.UserDataDto
 import org.springframework.http.HttpStatus

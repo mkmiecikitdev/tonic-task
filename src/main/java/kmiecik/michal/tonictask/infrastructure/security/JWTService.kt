@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
-import kmiecik.michal.tonictask.infrastructure.rest.Constants.BEARER
+import kmiecik.michal.tonictask.infrastructure.rest.helpers.Constants.BEARER
 import kmiecik.michal.tonictask.users.api.UserDataDto
 import java.util.*
 

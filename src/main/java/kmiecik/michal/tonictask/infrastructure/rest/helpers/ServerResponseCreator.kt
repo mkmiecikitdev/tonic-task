@@ -1,10 +1,10 @@
-package kmiecik.michal.tonictask.infrastructure.rest
+package kmiecik.michal.tonictask.infrastructure.rest.helpers
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.convertValue
 import kmiecik.michal.tonictask.errors.AppError
-import kmiecik.michal.tonictask.infrastructure.rest.Constants.AUTH_HEADER_KEY
-import kmiecik.michal.tonictask.infrastructure.rest.Constants.BEARER
+import kmiecik.michal.tonictask.infrastructure.rest.helpers.Constants.AUTH_HEADER_KEY
+import kmiecik.michal.tonictask.infrastructure.rest.helpers.Constants.BEARER
 import kmiecik.michal.tonictask.infrastructure.security.JwtService
 import kmiecik.michal.tonictask.kernel.MonoEither
 import kmiecik.michal.tonictask.users.api.UserDataDto
