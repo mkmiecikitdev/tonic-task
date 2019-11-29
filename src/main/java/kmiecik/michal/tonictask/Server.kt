@@ -3,6 +3,7 @@ package kmiecik.michal.tonictask
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.vavr.jackson.datatype.VavrModule
+import kmiecik.michal.tonictask.infrastructure.rest.FilmHandler
 import kmiecik.michal.tonictask.infrastructure.rest.RepertoireHandler
 import kmiecik.michal.tonictask.infrastructure.rest.UsersHandler
 import kmiecik.michal.tonictask.infrastructure.security.JwtService
@@ -24,6 +25,7 @@ class Server {
                 .toHttpHandler(
                         UsersHandler(app.usersFacade, jwtService, objectMapper).routes()
                                 .and(RepertoireHandler(app.repertoireFacade, jwtService, objectMapper).routes())
+                                .and(FilmHandler(app.filmsFacade, jwtService, objectMapper).routes())
 
                 )
 

@@ -2,18 +2,19 @@ package kmiecik.michal.tonictask.films
 
 import io.vavr.collection.List
 import kmiecik.michal.tonictask.films.api.FilmDto
-import kmiecik.michal.tonictask.films.api.NewFilm
+import kmiecik.michal.tonictask.films.api.NewCatalogDto
+import kmiecik.michal.tonictask.films.api.NewFilmDto
 import reactor.core.publisher.Mono
 
 class FilmsFacade(
         private val filmsRepository: FilmsRepository,
         private val filmFactory: FilmFactory = FilmFactory()) {
 
-    fun createFilmCatalog(newFilms: List<NewFilm>): Mono<List<FilmDto>> {
+    fun createFilmCatalog(newCatalog: NewCatalogDto): Mono<List<FilmDto>> {
         return filmsRepository.countAll()
                 .flatMap { count ->
                     if (count > 0) listFilms()
-                    else saveNewFilms(newFilms)
+                    else saveNewFilms(newCatalog.films)
                 }
     }
 
@@ -24,7 +25,7 @@ class FilmsFacade(
                 .map { List.ofAll(it) }
     }
 
-    private fun saveNewFilms(newFilms: List<NewFilm>): Mono<List<FilmDto>> {
+    private fun saveNewFilms(newFilms: List<NewFilmDto>): Mono<List<FilmDto>> {
         return newFilms.map { filmFactory.create(it) }
                 .let { filmsRepository.saveAll(it) }
                 .map { it.toDto() }

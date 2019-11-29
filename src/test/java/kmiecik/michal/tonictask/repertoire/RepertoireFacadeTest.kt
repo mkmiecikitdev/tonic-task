@@ -1,7 +1,7 @@
 package kmiecik.michal.tonictask.repertoire
 
 
-import kmiecik.michal.tonictask.TestSamples.sampleFilms
+import kmiecik.michal.tonictask.TestSamples.sampleCatalog
 import kmiecik.michal.tonictask.TestUtils.assertMono
 import kmiecik.michal.tonictask.TestUtils.assertMonoEitherLeft
 import kmiecik.michal.tonictask.TestUtils.assertMonoEitherRight
@@ -12,7 +12,6 @@ import kmiecik.michal.tonictask.repertoire.api.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class RepertoireFacadeTest {
@@ -29,7 +28,7 @@ class RepertoireFacadeTest {
     @Test
     fun shouldReturnRepertoiresWithDefaultPriceAndNoDisplayTimes() {
         // given
-        filmsFacade.createFilmCatalog(sampleFilms()).block()
+        filmsFacade.createFilmCatalog(sampleCatalog()).block()
 
         // when
         val result = facade.listExtendedRepertoiresData()

@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono
 class RepertoireHandler(private val repertoireFacade: RepertoireFacade, private val jwtService: JwtService, private val objectMapper: ObjectMapper) {
 
     fun routes() = router {
-        "/film".nest {
+        "/repertoires".nest {
             POST("/updateprice", this@RepertoireHandler::updateFilmPrice)
             POST("/addtime", this@RepertoireHandler::addFilmTime)
             POST("/removetime", this@RepertoireHandler::removeFilmTime)
@@ -56,5 +56,4 @@ class RepertoireHandler(private val repertoireFacade: RepertoireFacade, private 
             }
         }
     }
-
 }

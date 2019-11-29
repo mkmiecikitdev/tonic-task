@@ -27,7 +27,7 @@ class RatingsFacadeTest {
     @Test
     fun shouldReturnRatingsWithNoAverage() {
         // given
-        filmsFacade.createFilmCatalog(TestSamples.sampleFilms()).block()
+        filmsFacade.createFilmCatalog(TestSamples.sampleCatalog()).block()
 
         // when
         val result = facade.listExtendedRaintsData()
