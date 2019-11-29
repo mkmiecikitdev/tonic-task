@@ -36,7 +36,7 @@ class JwtService(private val objectMapper: ObjectMapper) {
 
     private fun getSecret(): String {
         return Try.of {
-            javaClass.classLoader.getResourceAsStream("sensitive.properties").let {
+            javaClass.classLoader.getResourceAsStream("keys.properties").let {
                 val prop = Properties()
                 prop.load(it)
                 prop.getProperty("jwt.secret")
