@@ -1,12 +1,10 @@
 package kmiecik.michal.tonictask.infrastructure.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
-import io.vavr.jackson.datatype.VavrModule
-import kmiecik.michal.tonictask.infrastructure.rest.BEARER
+import kmiecik.michal.tonictask.infrastructure.rest.Constants.BEARER
 import kmiecik.michal.tonictask.users.api.UserDataDto
 import java.util.*
 
@@ -30,8 +28,7 @@ class JwtService(private val objectMapper: ObjectMapper) {
             }
 
     companion object {
-        const val JWT_SECRET: String = "SgVkYp2s5v8y/B?E(H+MbQeThWmZq4t6w9z\$C&F)J@NcRfUjXn2r5u8x!A%D*G-KaPdSgVkYp3s6v9y\$B?E(H+MbQeThWmZq4t7w!z%C*F)J@NcRfUjXn2r5u8x/A?D(" // TODO FROM SAFE FILE
-        const val EXPIRATION = 864000000
+        private const val JWT_SECRET: String = "SgVkYp2s5v8y/B?E(H+MbQeThWmZq4t6w9z\$C&F)J@NcRfUjXn2r5u8x!A%D*G-KaPdSgVkYp3s6v9y\$B?E(H+MbQeThWmZq4t7w!z%C*F)J@NcRfUjXn2r5u8x/A?D(" // TODO FROM SAFE FILE
+        private const val EXPIRATION = 864000000
     }
-
 }

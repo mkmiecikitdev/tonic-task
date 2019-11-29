@@ -19,12 +19,12 @@ class Server {
         val objectMapper: ObjectMapper = ObjectMapper().registerModule(KotlinModule()).registerModule(VavrModule())
         val jwtService = JwtService(objectMapper)
         val securityWrapper = SecurityWrapper(jwtService)
-        val serverResponseCreator = ServerResponseCreator(objectMapper)
+        val serverResponseCreator = ServerResponseCreator(objectMapper, jwtService)
 
 
         val httpHandler = RouterFunctions
                 .toHttpHandler(
-                        UsersHandler(app.usersFacade, jwtService, objectMapper).routes()
+                        UsersHandler(app.usersFacade, serverResponseCreator).routes()
                                 .and(RepertoireHandler(app.repertoireFacade, securityWrapper, serverResponseCreator).routes())
                                 .and(FilmHandler(app.filmsFacade, securityWrapper, serverResponseCreator).routes())
 

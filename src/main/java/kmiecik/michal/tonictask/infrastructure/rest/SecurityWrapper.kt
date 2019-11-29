@@ -2,6 +2,7 @@ package kmiecik.michal.tonictask.infrastructure.rest
 
 import io.vavr.control.Try
 import kmiecik.michal.tonictask.errors.AppError
+import kmiecik.michal.tonictask.infrastructure.rest.Constants.AUTH_HEADER_KEY
 import kmiecik.michal.tonictask.infrastructure.security.JwtService
 import kmiecik.michal.tonictask.users.Role
 import kmiecik.michal.tonictask.users.api.UserDataDto
@@ -32,8 +33,8 @@ class SecurityWrapper(private val jwtService: JwtService) {
     private fun resolveStatus(appError: AppError): HttpStatus {
         return when (appError) {
             AppError.UNAUTHORIZED -> HttpStatus.UNAUTHORIZED
+            AppError.BAD_CREDENTIALS -> HttpStatus.NOT_ACCEPTABLE
             else -> HttpStatus.BAD_REQUEST
         }
     }
-
 }

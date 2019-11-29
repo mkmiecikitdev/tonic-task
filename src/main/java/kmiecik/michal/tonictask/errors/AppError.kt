@@ -5,6 +5,7 @@ import reactor.core.publisher.Mono
 
 enum class AppError {
 
+    BAD_CREDENTIALS,
     UNAUTHORIZED,
     CANNOT_PARSE_DATE,
     CANNOT_PARSE_CURRENCY,
