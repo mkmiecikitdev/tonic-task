@@ -11,9 +11,11 @@ import reactor.core.publisher.Mono
 class UsersHandler(private val usersFacade: UsersFacade, private val serverResponseCreator: ServerResponseCreator) {
 
     fun routes() = router {
-        POST("/addcustomer", this@UsersHandler::addCustomer)
-        POST("/addowner", this@UsersHandler::addOwner)
-        POST("/login", this@UsersHandler::login)
+        "/users".nest {
+            POST("/customer", this@UsersHandler::addCustomer)
+            POST("/owner", this@UsersHandler::addOwner)
+            POST("/login", this@UsersHandler::login)
+        }
     }
 
     private fun addCustomer(req: ServerRequest): Mono<ServerResponse> {
