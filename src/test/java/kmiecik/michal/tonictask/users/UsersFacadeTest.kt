@@ -19,7 +19,7 @@ class UsersFacadeTest {
     }
 
     @Test
-    fun shouldReturnRatingsWithNoAverage() {
+    fun shouldAddCustomer() {
         // given
         val form = UserFormDto(login = "user1", password = "pass")
 
@@ -27,11 +27,26 @@ class UsersFacadeTest {
         val result = facade.addCustomer(form)
 
         // then
-
         assertMonoEitherRight(result) {
             assertEquals("user1", it.login)
             assertTrue { it.roles.contains(Role.CUSTOMER) }
             assertTrue { !it.roles.contains(Role.OWNER) }
+        }
+    }
+
+    @Test
+    fun shouldAddOwner() {
+        // given
+        val form = UserFormDto(login = "user1", password = "pass")
+
+        // when
+        val result = facade.addOwner(form)
+
+        // then
+        assertMonoEitherRight(result) {
+            assertEquals("user1", it.login)
+            assertTrue { it.roles.contains(Role.CUSTOMER) }
+            assertTrue { it.roles.contains(Role.OWNER) }
         }
     }
 
@@ -45,7 +60,6 @@ class UsersFacadeTest {
         val result = facade.addCustomer(form)
 
         // then
-
         assertMonoEitherLeft(result) {
             assertEquals(AppError.LOGIN_EXISTS, it)
         }
@@ -61,7 +75,6 @@ class UsersFacadeTest {
         val result = facade.login(form)
 
         // then
-
         assertMonoEitherRight(result) {
             assertEquals("user1", it.login)
             assertEquals(2, it.roles.size())
@@ -81,7 +94,6 @@ class UsersFacadeTest {
         val result = facade.login(invalidLoginForm)
 
         // then
-
         assertMonoEitherLeft(result) {
             assertEquals(AppError.UNAUTHORIZED, it)
         }
@@ -98,10 +110,8 @@ class UsersFacadeTest {
         val result = facade.login(invalidLoginForm)
 
         // then
-
         assertMonoEitherLeft(result) {
             assertEquals(AppError.UNAUTHORIZED, it)
         }
     }
-
 }
